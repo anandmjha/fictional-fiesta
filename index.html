@@ -8,7 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: #fff1f2; margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
-        
+
+        /* Floating Hearts Background */
         .bg-hearts { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
         .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; user-select: none; }
         @keyframes float {
@@ -21,25 +22,25 @@
         .glass-card {
             position: relative;
             z-index: 10;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
 
-        /* IDENTICAL BUTTON STYLES FOR THE PRANK */
+        /* IDENTICAL BUTTON STYLING */
         .quiz-btn {
-            background-color: #4f46e5; /* Indigo 600 */
+            background-color: #f43f5e; /* Rose 500 */
             color: white;
             font-weight: bold;
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 2rem;
             border-radius: 1rem;
-            min-width: 130px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
+            transition: transform 0.1s ease;
         }
 
-        #runaway-btn { transition: all 0.15s ease-out; touch-action: none; z-index: 100; }
+        #runaway-btn { transition: all 0.2s ease; touch-action: none; z-index: 50; }
         .heart-icon { color: #e11d48; font-size: 50px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .hidden { display: none !important; }
@@ -53,31 +54,32 @@
     <div id="login-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
         <h2 class="text-xl font-bold text-slate-800 mb-6">Restricted Access</h2>
         <div class="space-y-4">
-            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-indigo-400">
-            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-indigo-400">
-            <button onclick="checkLogin()" type="button" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg active:bg-indigo-700">Login</button>
+            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400">
+            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400">
+            <button id="login-trigger" type="button" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg active:bg-rose-700">Login</button>
         </div>
         <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
     </div>
 
     <div id="welcome-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
-        <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello! 👋</h1>
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Target</span>! 👋</h1>
         <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
-        <button onclick="startQuiz()" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800">Start</button>
+        <button id="start-trigger" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800">Start</button>
     </div>
 
     <div id="quiz-container" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
-        <div class="flex justify-center gap-4 relative h-20 items-center">
+        <div class="flex justify-center gap-4 relative h-16 items-center">
             <button id="target-btn" type="button" class="quiz-btn active:scale-95"></button>
             <button id="runaway-btn" type="button" class="quiz-btn"></button>
         </div>
-        <p id="progress" class="mt-8 text-xs text-slate-400 font-medium tracking-widest uppercase"></p>
+        <p id="progress" class="mt-8 text-xs text-slate-300 font-medium tracking-widest uppercase"></p>
     </div>
 
     <script>
         const VALID_USERNAME = "SpecialOne"; 
         const VALID_PASSWORD = "123";
+        const TARGET_NAME = "Poonam Shukla"; 
 
         const quizData = [
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
@@ -112,6 +114,7 @@
             if(u === VALID_USERNAME && p === VALID_PASSWORD) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('welcome-section').classList.remove('hidden');
+                document.getElementById('display-name').innerText = TARGET_NAME;
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
@@ -128,36 +131,33 @@
             document.getElementById('target-btn').innerText = quizData[currentStep].target;
             const runBtn = document.getElementById('runaway-btn');
             runBtn.innerText = quizData[currentStep].run;
-            
-            // Reset position to be side-by-side with target button for each new question
             runBtn.style.position = 'static';
             document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
         }
 
         function moveButton() {
             const btn = document.getElementById('runaway-btn');
+            const padding = 25; // Safer padding for mobile
             
-            // Safety margin (10% of screen size)
-            const marginX = window.innerWidth * 0.1;
-            const marginY = window.innerHeight * 0.1;
-        
-            // Calculate usable width/height minus the button size and margins
-            const usableWidth = window.innerWidth - btn.offsetWidth - (marginX * 2);
-            const usableHeight = window.innerHeight - btn.offsetHeight - (marginY * 2);
-        
-            // Generate random position within that safe center area
-            const randomX = Math.floor(Math.random() * usableWidth) + marginX;
-            const randomY = Math.floor(Math.random() * usableHeight) + marginY;
-        
+            // Limit movement to visible screen area
+            const maxX = window.innerWidth - btn.offsetWidth - padding;
+            const maxY = window.innerHeight - btn.offsetHeight - padding;
+            
+            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+            
             btn.style.position = 'fixed';
             btn.style.left = randomX + 'px';
             btn.style.top = randomY + 'px';
         }
 
-        // Listeners
-        const rb = document.getElementById('runaway-btn');
-        rb.addEventListener('mouseover', moveButton);
-        rb.addEventListener('touchstart', (e) => { 
+        document.getElementById('login-trigger').addEventListener('click', checkLogin);
+        document.getElementById('start-trigger').addEventListener('click', startQuiz);
+
+        const runBtn = document.getElementById('runaway-btn');
+        // Combined hover and touch
+        runBtn.addEventListener('mouseenter', moveButton);
+        runBtn.addEventListener('touchstart', (e) => { 
             e.preventDefault(); 
             moveButton(); 
         });
@@ -171,11 +171,11 @@
                     particleCount: 150,
                     spread: 70,
                     origin: { y: 0.6 },
-                    colors: ['#4f46e5', '#fb7185', '#ffffff']
+                    colors: ['#e11d48', '#fb7185', '#ffffff']
                 });
                 document.getElementById('quiz-container').innerHTML = `
                     <div class="heart-icon mb-4" style="text-align:center; display:block;">❤️</div>
-                    <h1 class="text-3xl font-bold text-indigo-600 mb-2">Yayyyyy!</h1>
+                    <h1 class="text-3xl font-bold text-rose-600 mb-2">Yayyyyy!</h1>
                     <p class="text-slate-500 font-medium">I knew you'd say yes! 😉</p>
                 `;
             }
