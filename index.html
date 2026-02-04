@@ -11,31 +11,54 @@
             background-color: #fff1f2; margin: 0; overflow: hidden; 
             -webkit-tap-highlight-color: transparent; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none; /* Prevents text highlighting during the chase */
+            user-select: none;
         }
         .bg-hearts { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
         .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; }
         @keyframes float { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
 
+        /* LARGE OUTER CONTAINER (The Playground) */
+        .playground {
+            position: relative;
+            width: 95vw;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px dashed #fecdd3;
+            border-radius: 3rem;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
         .glass-card { 
-            position: relative; z-index: 10; background: rgba(255, 255, 255, 0.85); 
+            position: relative; z-index: 10; background: rgba(255, 255, 255, 0.9); 
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
-            width: 95%; max-width: 500px; min-height: 480px;
+            width: 90%; max-width: 450px; min-height: 400px;
             display: flex; flex-direction: column; justify-content: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
         }
         
         .quiz-btn { 
             background-color: #f43f5e; color: white; font-weight: bold; 
-            padding: 0.85rem 1.8rem; border-radius: 1.25rem; min-width: 140px; 
+            padding: 0.85rem 1.8rem; border-radius: 1.25rem; min-width: 130px; 
             box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.3);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
+            transition: transform 0.1s ease;
+            cursor: pointer; border: none;
         }
 
         #runaway-btn { 
-            transition: left 0.2s ease-out, top 0.2s ease-out; 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             touch-action: none; z-index: 9999; 
         }
+
+        /* Funny Message Toast */
+        .toast {
+            position: fixed; color: #e11d48; font-weight: bold; font-size: 0.9rem;
+            pointer-events: none; animation: popUp 0.8s ease-out forwards; z-index: 10000;
+        }
+        @keyframes popUp { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-50px); } }
         
         .heart-icon { color: #e11d48; font-size: 65px; animation: pulse 1.5s infinite; text-align: center; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
@@ -47,33 +70,37 @@
 <body class="h-screen flex items-center justify-center p-4">
     <div id="hearts-bg" class="bg-hearts"></div>
 
-    <div id="login-section" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100 fade-in">
-        <h2 class="text-2xl font-bold text-slate-800 mb-8">Login For Surprise</h2>
-        <div class="space-y-5">
-            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-4 border rounded-2xl outline-rose-400">
-            <input type="password" id="user-pass" placeholder="Password" class="w-full p-4 border rounded-2xl outline-rose-400">
-            <button onclick="checkLogin()" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-4 rounded-2xl shadow-md hover:bg-[#f9a8d4] transition-all">Login</button>
+    <div class="playground" id="main-playground">
+        <div id="login-section" class="glass-card text-center p-10 rounded-[2.5rem] border border-rose-100 fade-in">
+            <h2 class="text-2xl font-bold text-slate-800 mb-8">Login For Surprise</h2>
+            <div class="space-y-5">
+                <input type="text" id="user-id" placeholder="User ID" class="w-full p-4 border rounded-2xl outline-rose-400">
+                <input type="password" id="user-pass" placeholder="Password" class="w-full p-4 border rounded-2xl outline-rose-400">
+                <button onclick="checkLogin()" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-4 rounded-2xl">Login</button>
+            </div>
+            <p id="login-error" class="text-red-500 text-sm mt-4 hidden">Incorrect details!</p>
         </div>
-        <p id="login-error" class="text-red-500 text-sm mt-4 hidden">Incorrect details!</p>
-    </div>
 
-    <div id="welcome-section" class="glass-card text-center p-10 rounded-[2.5rem] hidden">
-        <h1 class="text-4xl font-bold text-slate-800 mb-4">Hello, <span class="text-rose-500">Poonam Shukla</span>! 👋</h1>
-        <p class="text-slate-500 text-lg mb-10">Ready for some special questions?</p>
-        <button onclick="startQuiz()" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-4 px-12 rounded-2xl shadow-md">Start</button>
-    </div>
-
-    <div id="quiz-container" class="glass-card text-center p-10 rounded-[2.5rem] hidden">
-        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-14 min-h-[5rem] fade-in"></h1>
-        <div class="flex justify-center gap-8 relative h-32 items-center">
-            <button id="target-btn" onclick="nextQuestion()" class="quiz-btn"></button>
-            <button id="runaway-btn" class="quiz-btn"></button>
+        <div id="welcome-section" class="glass-card text-center p-10 rounded-[2.5rem] hidden">
+            <h1 class="text-4xl font-bold text-slate-800 mb-4">Hello, <span class="text-rose-500">Poonam Shukla</span>! 👋</h1>
+            <p class="text-slate-500 text-lg mb-10">Taiyar ho? Catch the button if you can! 😉</p>
+            <button onclick="startQuiz()" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-4 px-12 rounded-2xl shadow-md">Let's Go!</button>
         </div>
-        <p id="progress" class="mt-12 text-sm text-slate-400 font-bold tracking-widest uppercase"></p>
+
+        <div id="quiz-container" class="glass-card text-center p-10 rounded-[2.5rem] hidden">
+            <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-14 min-h-[5rem] fade-in"></h1>
+            <div id="btn-wrapper" class="flex justify-center gap-6 relative h-32 items-center">
+                <button id="target-btn" onclick="nextQuestion()" class="quiz-btn"></button>
+                <button id="runaway-btn" class="quiz-btn"></button>
+            </div>
+            <p id="progress" class="mt-12 text-sm text-slate-400 font-bold tracking-widest uppercase"></p>
+        </div>
     </div>
 
     <script>
         const VALID_USERNAME = "SpecialOne", VALID_PASSWORD = "123";
+        const funnyMessages = ["Slow! 😂", "Nice try!", "Try harder!", "Too slow!", "Not today!", "Close! 😜", "Oye hoye!"];
+        
         const quizData = [
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
             { q: "Hum dono mein se pagal kon hai?", target: "Main", run: "Tum" },
@@ -86,9 +113,10 @@
         ];
 
         let currentStep = 0;
+
+        // Background Hearts logic
         setInterval(() => {
             const container = document.getElementById('hearts-bg');
-            if (!container) return;
             const heart = document.createElement('div');
             heart.innerHTML = '❤️';
             heart.classList.add('floating-heart');
@@ -116,48 +144,76 @@
 
         function updateUI() {
             const runBtn = document.getElementById('runaway-btn');
+            const wrapper = document.getElementById('btn-wrapper');
+            runBtn.style.position = 'static';
+            wrapper.appendChild(runBtn);
             document.getElementById('question-text').innerText = quizData[currentStep].q;
             document.getElementById('target-btn').innerText = quizData[currentStep].target;
             runBtn.innerText = quizData[currentStep].run;
-            runBtn.style.position = 'static';
             document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
         }
 
-        function moveButton() {
-            const btn = document.getElementById('runaway-btn'), target = document.getElementById('target-btn');
-            const padding = 50, winW = window.innerWidth, winH = window.innerHeight;
-            const targetRect = target.getBoundingClientRect();
-            let newX, newY, attempts = 0, minDist = winW < 400 ? 120 : 200;
+        function moveButton(e) {
+            const btn = document.getElementById('runaway-btn');
+            const playground = document.getElementById('main-playground');
+            const rect = playground.getBoundingClientRect();
 
-            do {
-                newX = Math.random() * (winW - btn.offsetWidth - padding * 2) + padding;
-                newY = Math.random() * (winH - btn.offsetHeight - padding * 2) + padding;
-                const dist = Math.hypot((newX + btn.offsetWidth/2) - (targetRect.left + targetRect.width/2), (newY + btn.offsetHeight/2) - (targetRect.top + targetRect.height/2));
-                if (dist > minDist) break;
-                attempts++;
-            } while (attempts < 100);
+            // Breakout logic: Move within playground container limits
+            if (btn.parentNode !== playground) {
+                playground.appendChild(btn);
+            }
 
-            btn.style.position = 'fixed';
-            btn.style.left = newX + 'px';
-            btn.style.top = newY + 'px';
+            const padding = 20;
+            // Generate random position within the Playground dimensions
+            const maxX = rect.width - btn.offsetWidth - padding;
+            const maxY = rect.height - btn.offsetHeight - padding;
+
+            const randomX = Math.max(padding, Math.random() * maxX);
+            const randomY = Math.max(padding, Math.random() * maxY);
+
+            btn.style.position = 'absolute';
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
+
+            // Show funny message
+            showToast(e);
+        }
+
+        function showToast(e) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+            
+            // Position toast near the mouse or touch point
+            const x = e.clientX || (e.touches ? e.touches[0].clientX : window.innerWidth/2);
+            const y = e.clientY || (e.touches ? e.touches[0].clientY : window.innerHeight/2);
+            
+            toast.style.left = x + 'px';
+            toast.style.top = y + 'px';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 800;
         }
 
         function nextQuestion() {
             currentStep++;
-            if (currentStep < quizData.length) { updateUI(); }
-            else {
+            if (currentStep < quizData.length) { 
+                updateUI(); 
+            } else {
                 confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
                 document.getElementById('quiz-container').innerHTML = `
                     <div class="heart-icon mb-6">❤️</div>
                     <h1 class="text-4xl font-bold text-rose-600 mb-4 fade-in">Yayyyyy!</h1>
-                    <p class="text-xl text-slate-600 font-medium fade-in">I knew you'd say yes, Poonam! 😉</p>
+                    <p class="text-xl text-slate-600 font-medium fade-in">Finally click ho gaya! I knew you'd say yes, Poonam! 😉</p>
                 `;
             }
         }
 
         const rb = document.getElementById('runaway-btn');
         rb.addEventListener('mouseover', moveButton);
-        rb.addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); }, { passive: false });
+        rb.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            moveButton(e); 
+        }, { passive: false });
     </script>
 </body>
 </html>
