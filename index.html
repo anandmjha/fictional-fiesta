@@ -20,22 +20,25 @@
         
         /* IDENTICAL TWIN BUTTONS */
         .quiz-btn { 
-            background-color: #f43f5e; /* Rose 500 */
+            background-color: #f43f5e; 
             color: white; 
             font-weight: bold; 
-            padding: 0.75rem 2rem; 
+            padding: 0.75rem 1.5rem; 
             border-radius: 1rem; 
             min-width: 130px; 
             border: none; 
-            transition: transform 0.1s ease;
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            white-space: nowrap; /* Prevents text from wrapping/breaking */
         }
-        .quiz-btn:active { transform: scale(0.9); }
 
-        .baby-pink-btn { background-color: #fbcfe8; color: #9d174d; font-weight: bold; padding: 0.75rem 2rem; border-radius: 1rem; border: none; cursor: pointer; }
-
-        #runaway-btn { transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); touch-action: none; z-index: 100; }
+        /* HIGHEST Z-INDEX TO ENSURE IT'S ALWAYS ON TOP */
+        #runaway-btn { 
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            touch-action: none; 
+            z-index: 9999; 
+        }
+        
         .heart-icon { color: #e11d48; font-size: 50px; animation: pulse 1.5s infinite; text-align: center; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .hidden { display: none !important; }
@@ -51,7 +54,7 @@
         <div class="space-y-4">
             <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400">
             <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400">
-            <button onclick="checkLogin()" type="button" class="w-full baby-pink-btn shadow-lg">Login</button>
+            <button onclick="checkLogin()" type="button" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-3 rounded-xl shadow-lg">Login</button>
         </div>
         <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
     </div>
@@ -59,12 +62,12 @@
     <div id="welcome-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Poonam Shukla</span>! 👋</h1>
         <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
-        <button onclick="startQuiz()" type="button" class="baby-pink-btn px-10 shadow-lg">Start</button>
+        <button onclick="startQuiz()" type="button" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-3 px-10 rounded-xl shadow-lg">Start</button>
     </div>
 
     <div id="quiz-container" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
-        <div class="flex justify-center gap-4 relative h-20 items-center">
+        <div class="flex justify-center gap-4 relative h-24 items-center">
             <button id="target-btn" onclick="nextQuestion()" type="button" class="quiz-btn"></button>
             <button id="runaway-btn" type="button" class="quiz-btn"></button>
         </div>
@@ -74,7 +77,6 @@
     <script>
         const VALID_USERNAME = "SpecialOne"; 
         const VALID_PASSWORD = "123";
-        const TARGET_NAME = "Poonam Shukla"; 
 
         const quizData = [
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
@@ -133,17 +135,21 @@
         function moveButton() {
             const btn = document.getElementById('runaway-btn');
             
-            // MATH FOR PERFECT INVISIBLE BOX
-            // We use 80% of viewport to ensure it never touches the absolute edges
-            const safeWidth = window.innerWidth * 0.8;
-            const safeHeight = window.innerHeight * 0.8;
+            // EDGE PROTECTION
+            const edgePadding = 60; // 60 pixels away from ANY edge
             
-            // Calculate offsets to keep the box centered
-            const offsetX = (window.innerWidth - safeWidth) / 2;
-            const offsetY = (window.innerHeight - safeHeight) / 2;
+            // Visible screen size
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
 
-            const randomX = offsetX + Math.random() * (safeWidth - btn.offsetWidth);
-            const randomY = offsetY + Math.random() * (safeHeight - btn.offsetHeight);
+            // Safe range calculation
+            // We subtract button width and padding from BOTH sides
+            const maxX = vw - btn.offsetWidth - edgePadding;
+            const maxY = vh - btn.offsetHeight - edgePadding;
+
+            // Generate coordinate, but never lower than the padding
+            const randomX = Math.max(edgePadding, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(edgePadding, Math.floor(Math.random() * maxY));
 
             btn.style.position = 'fixed';
             btn.style.left = `${randomX}px`;
