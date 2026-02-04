@@ -7,46 +7,40 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { 
-            background-color: #fff1f2; 
-            margin: 0; 
-            overflow: hidden; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
-        /* Floating Hearts Background */
-        .bg-hearts {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-        .floating-heart {
-            position: absolute;
-            bottom: -50px;
-            color: #fecdd3;
-            animation: float 10s linear infinite;
-            opacity: 0.6;
-        }
+        body { background-color: #fff1f2; margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        
+        .bg-hearts { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+        .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; user-select: none; }
         @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
-            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
 
-        #runaway-btn { 
-            transition: all 0.2s ease; 
-            touch-action: none; 
-            z-index: 50; 
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
-        .heart-icon { 
-            color: #e11d48; 
-            font-size: 50px; 
-            animation: pulse 1.5s infinite; 
+
+        /* IDENTICAL BUTTON STYLES */
+        .quiz-btn {
+            background-color: #4f46e5; /* Indigo-600 */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: all 0.2s ease;
+            min-width: 120px;
         }
-        @keyframes pulse { 
-            0%, 100% { transform: scale(1); } 
-            50% { transform: scale(1.2); } 
-        }
+
+        #runaway-btn { transition: all 0.2s ease; touch-action: none; z-index: 50; border: none; }
+        .heart-icon { color: #e11d48; font-size: 50px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .hidden { display: none !important; }
         input { font-size: 16px !important; }
     </style>
@@ -55,40 +49,34 @@
 
     <div id="hearts-bg" class="bg-hearts"></div>
 
-    <div id="login-section" class="text-center p-8 bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 relative">
+    <div id="login-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
         <h2 class="text-xl font-bold text-slate-800 mb-6">Restricted Access</h2>
         <div class="space-y-4">
-            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400 bg-slate-50">
-            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400 bg-slate-50">
-            <button id="login-trigger" type="button" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg active:bg-rose-700 transition-colors">
-                Login
-            </button>
+            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-indigo-400">
+            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-indigo-400">
+            <button id="login-trigger" type="button" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg active:bg-indigo-700">Login</button>
         </div>
         <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
     </div>
 
-    <div id="welcome-section" class="text-center p-8 bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
-        <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Target</span>! 👋</h1>
+    <div id="welcome-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello! 👋</h1>
         <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
-        <button id="start-trigger" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800 transition-colors">
-            Start
-        </button>
+        <button id="start-trigger" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800">Start</button>
     </div>
 
-    <div id="quiz-container" class="text-center p-8 bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
+    <div id="quiz-container" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
         <div class="flex justify-center gap-4 relative h-16 items-center">
-            <button id="target-btn" type="button" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all active:scale-95"></button>
-            <button id="runaway-btn" type="button" class="bg-slate-100 text-slate-400 font-bold py-3 px-8 rounded-2xl border border-slate-200 shadow-sm"></button>
+            <button id="target-btn" type="button" class="quiz-btn active:scale-95"></button>
+            <button id="runaway-btn" type="button" class="quiz-btn"></button>
         </div>
-        <p id="progress" class="mt-8 text-xs text-slate-300 font-medium tracking-widest uppercase"></p>
+        <p id="progress" class="mt-8 text-xs text-slate-400 font-medium tracking-widest uppercase"></p>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const VALID_USERNAME = "SpecialOne"; 
         const VALID_PASSWORD = "123";
-        const TARGET_NAME = "Poonam Shukla"; 
 
         const quizData = [
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
@@ -103,34 +91,31 @@
 
         let currentStep = 0;
 
-        // --- BACKGROUND HEART BUBBLES ---
         function createHeart() {
             const container = document.getElementById('hearts-bg');
+            if (!container) return;
             const heart = document.createElement('div');
             heart.innerHTML = '❤️';
             heart.classList.add('floating-heart');
             heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
-            heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
             container.appendChild(heart);
-            setTimeout(() => heart.remove(), 10000);
+            setTimeout(() => heart.remove(), 8000);
         }
-        setInterval(createHeart, 600);
+        setInterval(createHeart, 500);
 
-        // --- LOGIN LOGIC ---
         function checkLogin() {
             const u = document.getElementById('user-id').value.trim();
             const p = document.getElementById('user-pass').value.trim();
             if(u === VALID_USERNAME && p === VALID_PASSWORD) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('welcome-section').classList.remove('hidden');
-                document.getElementById('display-name').innerText = TARGET_NAME;
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
         }
 
-        // --- QUIZ LOGIC ---
         function startQuiz() {
             document.getElementById('welcome-section').classList.add('hidden');
             document.getElementById('quiz-container').classList.remove('hidden');
@@ -158,18 +143,8 @@
             btn.style.top = randomY + 'px';
         }
 
-        // --- LISTENERS ---
         document.getElementById('login-trigger').addEventListener('click', checkLogin);
-        document.getElementById('login-trigger').addEventListener('touchstart', (e) => { 
-            if(e.cancelable) e.preventDefault(); 
-            checkLogin(); 
-        });
-
         document.getElementById('start-trigger').addEventListener('click', startQuiz);
-        document.getElementById('start-trigger').addEventListener('touchstart', (e) => { 
-            if(e.cancelable) e.preventDefault(); 
-            startQuiz(); 
-        });
 
         const runBtn = document.getElementById('runaway-btn');
         runBtn.addEventListener('mouseenter', moveButton);
@@ -183,17 +158,15 @@
             if (currentStep < quizData.length) {
                 updateUI();
             } else {
-                // Trigger Confetti
                 confetti({
                     particleCount: 150,
                     spread: 70,
                     origin: { y: 0.6 },
-                    colors: ['#e11d48', '#fb7185', '#ffffff']
+                    colors: ['#4f46e5', '#fb7185', '#ffffff']
                 });
-
                 document.getElementById('quiz-container').innerHTML = `
-                    <div class="heart-icon mb-4">❤️</div>
-                    <h1 class="text-3xl font-bold text-rose-600 mb-2">Yayyyyy!</h1>
+                    <div class="heart-icon mb-4" style="text-align:center; display:block;">❤️</div>
+                    <h1 class="text-3xl font-bold text-indigo-600 mb-2">Yayyyyy!</h1>
                     <p class="text-slate-500 font-medium">I knew you'd say yes! 😉</p>
                 `;
             }
