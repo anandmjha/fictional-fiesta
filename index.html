@@ -136,15 +136,19 @@
 
         function moveButton() {
             const btn = document.getElementById('runaway-btn');
-            const padding = 20; 
             
-            // Calculate safe bounds within the viewport
-            const maxX = window.innerWidth - btn.offsetWidth - padding;
-            const maxY = window.innerHeight - btn.offsetHeight - padding;
-            
-            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-            
+            // Safety margin (10% of screen size)
+            const marginX = window.innerWidth * 0.1;
+            const marginY = window.innerHeight * 0.1;
+        
+            // Calculate usable width/height minus the button size and margins
+            const usableWidth = window.innerWidth - btn.offsetWidth - (marginX * 2);
+            const usableHeight = window.innerHeight - btn.offsetHeight - (marginY * 2);
+        
+            // Generate random position within that safe center area
+            const randomX = Math.floor(Math.random() * usableWidth) + marginX;
+            const randomY = Math.floor(Math.random() * usableHeight) + marginY;
+        
             btn.style.position = 'fixed';
             btn.style.left = randomX + 'px';
             btn.style.top = randomY + 'px';
