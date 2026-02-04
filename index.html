@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sawal Jawab ❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #runaway-btn { transition: all 0.2s ease; touch-action: none; z-index: 50; }
+        .heart { color: #e11d48; font-size: 50px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="bg-rose-50 h-screen flex items-center justify-center overflow-hidden font-sans p-4">
+
+    <div id="login-section" class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
+        <h2 class="text-xl font-bold text-slate-800 mb-6">Restricted Access</h2>
+        <input type="text" id="user-id" placeholder="User ID" class="w-full mb-3 p-3 border rounded-xl outline-rose-400">
+        <input type="password" id="user-pass" placeholder="Password" class="w-full mb-6 p-3 border rounded-xl outline-rose-400">
+        <button onclick="checkLogin()" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg">Login</button>
+        <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
+    </div>
+
+    <div id="welcome-section" class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Target</span>! 👋</h1>
+        <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
+        <button onclick="startQuiz()" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg">Start</button>
+    </div>
+
+    <div id="quiz-container" class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
+        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
+        <div class="flex justify-center gap-4 relative h-16 items-center">
+            <button id="target-btn" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all active:scale-90"></button>
+            <button id="runaway-btn" class="bg-slate-100 text-slate-400 font-bold py-3 px-8 rounded-2xl border border-slate-200 shadow-sm"></button>
+        </div>
+        <p id="progress" class="mt-8 text-xs text-slate-300 font-medium tracking-widest uppercase"></p>
+    </div>
+
+    <script>
+        // CONFIGURATION
+        const VALID_USERNAME = "SpecialOne"; 
+        const VALID_PASSWORD = "123";
+        const TARGET_NAME = "Your Name"; // The name shown on the welcome page
+
+        const quizData = [
+            { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
+            { q: "Hum dono mein se pagal kon hai?", target: "Main", run: "Tum" },
+            { q: "Hum dono mein se dimaag wala kon hai?", target: "Tum", run: "Main" },
+            { q: "Hum dono mein se sabse aalsi kon hai?", target: "Main", run: "Tum" },
+            { q: "Hum dono mein se caring kon hai", target: "Tum", run: "Main" },
+            { q: "Hum dono mein se Kalesh kon karta hai?", target: "Main", run: "Tum" },
+            { q: "Hum dono mein se samjhne wala kon hai?", target: "Tum", run: "Main" },
+            { q: "Will you be my Valentine?", target: "Yes Yes Yess!!!", run: "NO!" }
+        ];
+
+        let currentStep = 0;
+
+        function checkLogin() {
+            const u = document.getElementById('user-id').value;
+            const p = document.getElementById('user-pass').value;
+            if(u === VALID_USERNAME && p === VALID_PASSWORD) {
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('welcome-section').classList.remove('hidden');
+                document.getElementById('display-name').innerText = TARGET_NAME;
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('welcome-section').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('question-text').innerText = quizData[currentStep].q;
+            document.getElementById('target-btn').innerText = quizData[currentStep].target;
+            document.getElementById('runaway-btn').innerText = quizData[currentStep].run;
+            document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
+            document.getElementById('runaway-btn').style.position = 'static';
+        }
+
+        function moveButton() {
+            const btn = document.getElementById('runaway-btn');
+            const padding = 20;
+            const maxX = window.innerWidth - btn.offsetWidth - padding;
+            const maxY = window.innerHeight - btn.offsetHeight - padding;
+            btn.style.position = 'fixed';
+            btn.style.left = Math.max(padding, Math.floor(Math.random() * maxX)) + 'px';
+            btn.style.top = Math.max(padding, Math.floor(Math.random() * maxY)) + 'px';
+        }
+
+        document.getElementById('runaway-btn').addEventListener('mouseenter', moveButton);
+        document.getElementById('runaway-btn').addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); });
+
+        document.getElementById('target-btn').addEventListener('click', () => {
+            currentStep++;
+            if (currentStep < quizData.length) {
+                updateUI();
+            } else {
+                document.getElementById('quiz-container').innerHTML = `
+                    <div class="heart mb-4">❤️</div>
+                    <h1 class="text-3xl font-bold text-rose-600 mb-2">Yayyyyy!</h1>
+                    <p class="text-slate-500">I knew you'd say yes! 😉</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
