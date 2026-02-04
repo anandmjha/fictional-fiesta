@@ -12,66 +12,76 @@
         .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; user-select: none; }
         @keyframes float {
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
             100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
-        .glass-card { position: relative; z-index: 10; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
         
-        /* IDENTICAL BUTTONS */
+        /* INCREASED CARD SIZE */
+        .glass-card { 
+            position: relative; 
+            z-index: 10; 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px); 
+            width: 95%;
+            max-width: 500px; /* Wider than before */
+            min-height: 400px; /* Taller than before */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
         .quiz-btn { 
             background-color: #f43f5e; 
             color: white; 
             font-weight: bold; 
-            padding: 0.75rem 1.5rem; 
+            padding: 0.8rem 2rem; 
             border-radius: 1rem; 
-            min-width: 120px; 
+            min-width: 140px; 
             border: none; 
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
             white-space: nowrap;
-            display: inline-block;
         }
 
-        /* The Runaway logic */
         #runaway-btn { 
-            transition: all 0.1s ease; 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             touch-action: none; 
-            z-index: 50; 
+            z-index: 999; 
         }
         
+        .baby-pink-btn { background-color: #fbcfe8; color: #9d174d; font-weight: bold; padding: 1rem 2.5rem; border-radius: 1.2rem; }
         .hidden { display: none !important; }
-        .baby-pink-btn { background-color: #fbcfe8; color: #9d174d; font-weight: bold; padding: 0.75rem 2rem; border-radius: 1rem; }
     </style>
 </head>
 <body class="h-screen flex items-center justify-center p-4">
 
     <div id="hearts-bg" class="bg-hearts"></div>
 
-    <div id="login-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Login for Surprise</h2>
-        <div class="space-y-4">
-            <input type="text" id="user-id" placeholder="User ID" class="w-full p-3 border rounded-xl outline-rose-400">
-            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400">
-            <button onclick="checkLogin()" class="w-full baby-pink-btn shadow-lg">Login</button>
+    <div id="login-section" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100">
+        <h2 class="text-2xl font-bold text-slate-800 mb-8">Restricted Access</h2>
+        <div class="space-y-5">
+            <input type="text" id="user-id" placeholder="User ID" class="w-full p-4 border rounded-2xl outline-rose-400">
+            <input type="password" id="user-pass" placeholder="Password" class="w-full p-4 border rounded-2xl outline-rose-400">
+            <button onclick="checkLogin()" class="w-full baby-pink-btn shadow-lg active:scale-95 transition-transform">Login</button>
         </div>
-        <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details!</p>
+        <p id="login-error" class="text-red-500 text-sm mt-4 hidden">Incorrect details!</p>
     </div>
 
-    <div id="welcome-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
-        <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, Poonam Shukla! 👋</h1>
-        <p class="text-slate-500 mb-8">Ready for some questions?</p>
-        <button onclick="startQuiz()" class="baby-pink-btn px-10 shadow-lg">Start</button>
+    <div id="welcome-section" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100 hidden">
+        <h1 class="text-4xl font-bold text-slate-800 mb-4">Hello, Poonam Shukla! 👋</h1>
+        <p class="text-slate-500 text-lg mb-10">I have a few special questions for you...</p>
+        <button onclick="startQuiz()" class="baby-pink-btn px-12 shadow-lg active:scale-95 transition-transform">Start</button>
     </div>
 
-    <div id="quiz-container" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
-        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
+    <div id="quiz-container" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100 hidden">
+        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-12 min-h-[5rem]"></h1>
         
-        <div id="play-area" class="relative w-full h-40 flex items-center justify-center gap-4">
+        <div class="flex justify-center gap-6 relative h-32 items-center">
             <button id="target-btn" onclick="nextQuestion()" class="quiz-btn"></button>
             <button id="runaway-btn" class="quiz-btn"></button>
         </div>
         
-        <p id="progress" class="mt-8 text-xs text-slate-400 font-medium uppercase"></p>
+        <p id="progress" class="mt-10 text-sm text-slate-400 font-bold uppercase tracking-tighter"></p>
     </div>
 
     <script>
@@ -82,7 +92,7 @@
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
             { q: "Hum dono mein se pagal kon hai?", target: "Main", run: "Tum" },
             { q: "Hum dono mein se dimaag wala kon hai?", target: "Tum", run: "Main" },
-            { q: "Hum dono mein se caring kon hai", target: "Tum", run: "Main" },
+            { q: "Hum dono mein se caring kon hai?", target: "Tum", run: "Main" },
             { q: "Will you be my Valentine?", target: "Yes!", run: "NO!" }
         ];
 
@@ -125,25 +135,38 @@
             document.getElementById('target-btn').innerText = quizData[currentStep].target;
             runBtn.innerText = quizData[currentStep].run;
             
-            // RESET to center-right on new question
             runBtn.style.position = 'static';
-            document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
+            document.getElementById('progress').innerText = `Question ${currentStep + 1} of ${quizData.length}`;
         }
 
         function moveButton() {
             const btn = document.getElementById('runaway-btn');
-            const playArea = document.getElementById('play-area');
+            const target = document.getElementById('target-btn');
+            const padding = 60; // Safe distance from screen edges
             
-            const areaW = playArea.clientWidth;
-            const areaH = playArea.clientHeight;
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            const targetRect = target.getBoundingClientRect();
 
-            // Generate random position ONLY within the play-area (the card itself)
-            const randomX = Math.floor(Math.random() * (areaW - btn.offsetWidth));
-            const randomY = Math.floor(Math.random() * (areaH - btn.offsetHeight));
+            let newX, newY, distance;
 
-            btn.style.position = 'absolute';
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
+            // Failsafe loop: Find a spot that doesn't overlap with the "Yes" button
+            do {
+                newX = Math.random() * (winW - btn.offsetWidth - (padding * 2)) + padding;
+                newY = Math.random() * (winH - btn.offsetHeight - (padding * 2)) + padding;
+                
+                // Calculate distance from center of Target button to new random spot
+                const centerX = newX + (btn.offsetWidth / 2);
+                const centerY = newY + (btn.offsetHeight / 2);
+                const targetCenterX = targetRect.left + (targetRect.width / 2);
+                const targetCenterY = targetRect.top + (targetRect.height / 2);
+
+                distance = Math.hypot(centerX - targetCenterX, centerY - targetCenterY);
+            } while (distance < 150); // Keep at least 150px away from the "Yes" button
+
+            btn.style.position = 'fixed';
+            btn.style.left = `${newX}px`;
+            btn.style.top = `${newY}px`;
         }
 
         function nextQuestion() {
@@ -151,14 +174,18 @@
             if (currentStep < quizData.length) {
                 updateUI();
             } else {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                document.getElementById('quiz-container').innerHTML = `<h1 class="text-3xl font-bold text-rose-600">Yayyyyy! ❤️</h1><p class="mt-4">I knew it, Poonam!</p>`;
+                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
+                document.getElementById('quiz-container').innerHTML = `
+                    <div class="text-6xl mb-6">❤️</div>
+                    <h1 class="text-4xl font-bold text-rose-600 mb-4">Yayyyyy!</h1>
+                    <p class="text-xl text-slate-600">I knew you'd say yes, Poonam! 😉</p>
+                `;
             }
         }
 
         const rb = document.getElementById('runaway-btn');
         rb.addEventListener('mouseover', moveButton);
-        rb.addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); });
+        rb.addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); }, {passive: false});
     </script>
 </body>
 </html>
