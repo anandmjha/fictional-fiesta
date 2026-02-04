@@ -13,12 +13,10 @@
         @keyframes float {
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             10% { opacity: 0.8; }
-            90% { opacity: 0.8; }
             100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
         .glass-card { position: relative; z-index: 10; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
         
-        /* IDENTICAL TWIN BUTTONS */
         .quiz-btn { 
             background-color: #f43f5e; 
             color: white; 
@@ -29,12 +27,11 @@
             border: none; 
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            white-space: nowrap; /* Prevents text from wrapping/breaking */
+            white-space: nowrap;
         }
 
-        /* HIGHEST Z-INDEX TO ENSURE IT'S ALWAYS ON TOP */
         #runaway-btn { 
-            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: left 0.2s ease-out, top 0.2s ease-out; 
             touch-action: none; 
             z-index: 9999; 
         }
@@ -42,7 +39,6 @@
         .heart-icon { color: #e11d48; font-size: 50px; animation: pulse 1.5s infinite; text-align: center; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .hidden { display: none !important; }
-        input { font-size: 16px !important; }
     </style>
 </head>
 <body class="h-screen flex items-center justify-center p-4">
@@ -50,19 +46,19 @@
     <div id="hearts-bg" class="bg-hearts"></div>
 
     <div id="login-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Login for Surprise</h2>
+        <h2 class="text-xl font-bold text-slate-800 mb-6">Restricted Access</h2>
         <div class="space-y-4">
             <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400">
             <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400">
-            <button onclick="checkLogin()" type="button" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-3 rounded-xl shadow-lg">Login</button>
+            <button onclick="checkLogin()" type="button" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-3 rounded-xl">Login</button>
         </div>
-        <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
+        <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details!</p>
     </div>
 
     <div id="welcome-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Poonam Shukla</span>! 👋</h1>
-        <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
-        <button onclick="startQuiz()" type="button" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-3 px-10 rounded-xl shadow-lg">Start</button>
+        <p class="text-slate-500 mb-8">Ready for some questions?</p>
+        <button onclick="startQuiz()" type="button" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-3 px-10 rounded-xl">Start</button>
     </div>
 
     <div id="quiz-container" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
@@ -134,26 +130,23 @@
 
         function moveButton() {
             const btn = document.getElementById('runaway-btn');
+            const padding = 80; // Large safety gap from all edges
             
-            // EDGE PROTECTION
-            const edgePadding = 60; // 60 pixels away from ANY edge
-            
-            // Visible screen size
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
+            // Get current window dimensions
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
 
-            // Safe range calculation
-            // We subtract button width and padding from BOTH sides
-            const maxX = vw - btn.offsetWidth - edgePadding;
-            const maxY = vh - btn.offsetHeight - edgePadding;
+            // Failsafe: Ensure max values are never below padding
+            const maxX = Math.max(padding, winW - btn.offsetWidth - padding);
+            const maxY = Math.max(padding, winH - btn.offsetHeight - padding);
 
-            // Generate coordinate, but never lower than the padding
-            const randomX = Math.max(edgePadding, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(edgePadding, Math.floor(Math.random() * maxY));
+            // Calculate random within the strictly clamped range
+            const randomX = Math.floor(Math.random() * (maxX - padding + 1)) + padding;
+            const randomY = Math.floor(Math.random() * (maxY - padding + 1)) + padding;
 
             btn.style.position = 'fixed';
-            btn.style.left = `${randomX}px`;
-            btn.style.top = `${randomY}px`;
+            btn.style.left = randomX + 'px';
+            btn.style.top = randomY + 'px';
         }
 
         function nextQuestion() {
@@ -161,12 +154,7 @@
             if (currentStep < quizData.length) {
                 updateUI();
             } else {
-                confetti({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#f43f5e', '#fbcfe8', '#ffffff']
-                });
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('quiz-container').innerHTML = `
                     <div class="heart-icon mb-4">❤️</div>
                     <h1 class="text-3xl font-bold text-rose-600 mb-2">Yayyyyy!</h1>
@@ -176,11 +164,12 @@
         }
 
         const rb = document.getElementById('runaway-btn');
+        // Mouseover for PC, Touchstart for Mobile
         rb.addEventListener('mouseover', moveButton);
-        rb.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            moveButton(); 
-        }, {passive: false});
+        rb.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            moveButton();
+        }, { passive: false });
     </script>
 </body>
 </html>
