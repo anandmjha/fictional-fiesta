@@ -7,52 +7,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { background-color: #fff1f2; margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        /* FLOATING HEARTS ANIMATION */
-        .bg-hearts { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
-        .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; user-select: none; }
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.8; }
-            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        body { 
+            background-color: #fff1f2; margin: 0; overflow: hidden; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none; /* Prevents text highlighting during the chase */
         }
+        .bg-hearts { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+        .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; }
+        @keyframes float { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } }
 
-        /* GLASS CARD EFFECTS - INCREASED SIZE & SPACING */
         .glass-card { 
-            position: relative; 
-            z-index: 10; 
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px); 
-            width: 95%;
-            max-width: 500px; /* Increased from 384px */
-            min-height: 480px; /* Increased for spacing */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            position: relative; z-index: 10; background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
+            width: 95%; max-width: 500px; min-height: 480px;
+            display: flex; flex-direction: column; justify-content: center;
         }
         
         .quiz-btn { 
-            background-color: #f43f5e; 
-            color: white; 
-            font-weight: bold; 
-            padding: 0.85rem 1.8rem; 
-            border-radius: 1.25rem; 
-            min-width: 140px; 
-            border: none; 
-            cursor: pointer;
+            background-color: #f43f5e; color: white; font-weight: bold; 
+            padding: 0.85rem 1.8rem; border-radius: 1.25rem; min-width: 140px; 
             box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.3);
-            white-space: nowrap;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
-        .quiz-btn:active { transform: scale(0.9); }
 
-        /* THE RUNAWAY LOGIC WITH SMOOTH MOVEMENT */
         #runaway-btn { 
-            transition: left 0.25s cubic-bezier(0.23, 1, 0.32, 1), top 0.25s cubic-bezier(0.23, 1, 0.32, 1); 
-            touch-action: none; 
-            z-index: 9999; 
+            transition: left 0.2s ease-out, top 0.2s ease-out; 
+            touch-action: none; z-index: 9999; 
         }
         
         .heart-icon { color: #e11d48; font-size: 65px; animation: pulse 1.5s infinite; text-align: center; }
@@ -63,38 +45,35 @@
     </style>
 </head>
 <body class="h-screen flex items-center justify-center p-4">
-
     <div id="hearts-bg" class="bg-hearts"></div>
 
     <div id="login-section" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100 fade-in">
-        <h2 class="text-2xl font-bold text-slate-800 mb-8">Restricted Access</h2>
+        <h2 class="text-2xl font-bold text-slate-800 mb-8">Login For Surprise</h2>
         <div class="space-y-5">
-            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-4 border rounded-2xl outline-rose-400 bg-white/50 focus:bg-white transition-all">
-            <input type="password" id="user-pass" placeholder="Password" class="w-full p-4 border rounded-2xl outline-rose-400 bg-white/50 focus:bg-white transition-all">
-            <button onclick="checkLogin()" type="button" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-4 rounded-2xl shadow-md hover:bg-[#f9a8d4] transition-colors">Login</button>
+            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-4 border rounded-2xl outline-rose-400">
+            <input type="password" id="user-pass" placeholder="Password" class="w-full p-4 border rounded-2xl outline-rose-400">
+            <button onclick="checkLogin()" class="w-full bg-[#fbcfe8] text-[#9d174d] font-bold py-4 rounded-2xl shadow-md hover:bg-[#f9a8d4] transition-all">Login</button>
         </div>
         <p id="login-error" class="text-red-500 text-sm mt-4 hidden">Incorrect details!</p>
     </div>
 
-    <div id="welcome-section" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100 hidden">
+    <div id="welcome-section" class="glass-card text-center p-10 rounded-[2.5rem] hidden">
         <h1 class="text-4xl font-bold text-slate-800 mb-4">Hello, <span class="text-rose-500">Poonam Shukla</span>! 👋</h1>
         <p class="text-slate-500 text-lg mb-10">Ready for some special questions?</p>
-        <button onclick="startQuiz()" type="button" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-4 px-12 rounded-2xl shadow-md hover:bg-[#f9a8d4] transition-all">Start</button>
+        <button onclick="startQuiz()" class="bg-[#fbcfe8] text-[#9d174d] font-bold py-4 px-12 rounded-2xl shadow-md">Start</button>
     </div>
 
-    <div id="quiz-container" class="glass-card text-center p-10 rounded-[2.5rem] shadow-2xl border border-rose-100 hidden">
-        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-14 min-h-[5rem] leading-snug fade-in"></h1>
+    <div id="quiz-container" class="glass-card text-center p-10 rounded-[2.5rem] hidden">
+        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-14 min-h-[5rem] fade-in"></h1>
         <div class="flex justify-center gap-8 relative h-32 items-center">
-            <button id="target-btn" onclick="nextQuestion()" type="button" class="quiz-btn"></button>
-            <button id="runaway-btn" type="button" class="quiz-btn"></button>
+            <button id="target-btn" onclick="nextQuestion()" class="quiz-btn"></button>
+            <button id="runaway-btn" class="quiz-btn"></button>
         </div>
         <p id="progress" class="mt-12 text-sm text-slate-400 font-bold tracking-widest uppercase"></p>
     </div>
 
     <script>
-        const VALID_USERNAME = "SpecialOne"; 
-        const VALID_PASSWORD = "123";
-
+        const VALID_USERNAME = "SpecialOne", VALID_PASSWORD = "123";
         const quizData = [
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
             { q: "Hum dono mein se pagal kon hai?", target: "Main", run: "Tum" },
@@ -107,8 +86,7 @@
         ];
 
         let currentStep = 0;
-
-        function createHeart() {
+        setInterval(() => {
             const container = document.getElementById('hearts-bg');
             if (!container) return;
             const heart = document.createElement('div');
@@ -119,19 +97,14 @@
             heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
             container.appendChild(heart);
             setTimeout(() => heart.remove(), 8000);
-        }
-        setInterval(createHeart, 600);
+        }, 600);
 
         function checkLogin() {
-            const u = document.getElementById('user-id').value.trim();
-            const p = document.getElementById('user-pass').value.trim();
-            if(u === VALID_USERNAME && p === VALID_PASSWORD) {
+            if(document.getElementById('user-id').value === VALID_USERNAME && document.getElementById('user-pass').value === VALID_PASSWORD) {
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('welcome-section').classList.remove('hidden');
                 document.getElementById('welcome-section').classList.add('fade-in', 'flex');
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
+            } else { document.getElementById('login-error').classList.remove('hidden'); }
         }
 
         function startQuiz() {
@@ -143,43 +116,26 @@
 
         function updateUI() {
             const runBtn = document.getElementById('runaway-btn');
-            const targetBtn = document.getElementById('target-btn');
-            const qText = document.getElementById('question-text');
-            
-            qText.innerText = quizData[currentStep].q;
-            targetBtn.innerText = quizData[currentStep].target;
+            document.getElementById('question-text').innerText = quizData[currentStep].q;
+            document.getElementById('target-btn').innerText = quizData[currentStep].target;
             runBtn.innerText = quizData[currentStep].run;
-            
-            // Reset position to relative flow for new question
             runBtn.style.position = 'static';
             document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
         }
 
         function moveButton() {
-            const btn = document.getElementById('runaway-btn');
-            const target = document.getElementById('target-btn');
-            const padding = 80; 
-            
-            const winW = window.innerWidth;
-            const winH = window.innerHeight;
+            const btn = document.getElementById('runaway-btn'), target = document.getElementById('target-btn');
+            const padding = 50, winW = window.innerWidth, winH = window.innerHeight;
             const targetRect = target.getBoundingClientRect();
+            let newX, newY, attempts = 0, minDist = winW < 400 ? 120 : 200;
 
-            let newX, newY, dist;
-
-            // Loop to ensure the new position doesn't overlap the "Yes" button
-            let attempts = 0;
             do {
-                newX = Math.random() * (winW - btn.offsetWidth - (padding * 2)) + padding;
-                newY = Math.random() * (winH - btn.offsetHeight - (padding * 2)) + padding;
-                
-                const centerX = newX + (btn.offsetWidth / 2);
-                const centerY = newY + (btn.offsetHeight / 2);
-                const targetCenterX = targetRect.left + (targetRect.width / 2);
-                const targetCenterY = targetRect.top + (targetRect.height / 2);
-
-                dist = Math.hypot(centerX - targetCenterX, centerY - targetCenterY);
+                newX = Math.random() * (winW - btn.offsetWidth - padding * 2) + padding;
+                newY = Math.random() * (winH - btn.offsetHeight - padding * 2) + padding;
+                const dist = Math.hypot((newX + btn.offsetWidth/2) - (targetRect.left + targetRect.width/2), (newY + btn.offsetHeight/2) - (targetRect.top + targetRect.height/2));
+                if (dist > minDist) break;
                 attempts++;
-            } while (dist < 200 && attempts < 20); // Keep 200px distance from "Yes"
+            } while (attempts < 100);
 
             btn.style.position = 'fixed';
             btn.style.left = newX + 'px';
@@ -188,10 +144,9 @@
 
         function nextQuestion() {
             currentStep++;
-            if (currentStep < quizData.length) {
-                updateUI();
-            } else {
-                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }, colors: ['#f43f5e', '#fbcfe8'] });
+            if (currentStep < quizData.length) { updateUI(); }
+            else {
+                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
                 document.getElementById('quiz-container').innerHTML = `
                     <div class="heart-icon mb-6">❤️</div>
                     <h1 class="text-4xl font-bold text-rose-600 mb-4 fade-in">Yayyyyy!</h1>
@@ -202,10 +157,7 @@
 
         const rb = document.getElementById('runaway-btn');
         rb.addEventListener('mouseover', moveButton);
-        rb.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            moveButton();
-        }, { passive: false });
+        rb.addEventListener('touchstart', (e) => { e.preventDefault(); moveButton(); }, { passive: false });
     </script>
 </body>
 </html>
