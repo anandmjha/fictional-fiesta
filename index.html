@@ -7,11 +7,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { background-color: #fff1f2; margin: 0; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background-color: #fff1f2; 
+            margin: 0; 
+            overflow: hidden; 
+            -webkit-tap-highlight-color: transparent; 
+        }
 
-        /* Floating Hearts Background */
-        .bg-hearts { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
-        .floating-heart { position: absolute; bottom: -10vh; color: #fecdd3; animation: float 8s linear infinite; user-select: none; }
+        .bg-hearts {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
+            z-index: 0; 
+            pointer-events: none;
+        }
+        .floating-heart {
+            position: absolute;
+            bottom: -10vh;
+            color: #fecdd3;
+            animation: float 8s linear infinite;
+            user-select: none;
+        }
         @keyframes float {
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             10% { opacity: 0.8; }
@@ -27,17 +45,27 @@
             -webkit-backdrop-filter: blur(8px);
         }
 
-        /* IDENTICAL BUTTON STYLING */
+        /* ROSE PINK FOR MAIN BUTTONS */
         .quiz-btn {
-            background-color: #f43f5e; /* Rose 500 */
+            background-color: #f43f5e; /* Rose Pink */
             color: white;
             font-weight: bold;
             padding: 0.75rem 2rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             min-width: 120px;
-            transition: transform 0.1s ease;
+            border: none;
+        }
+
+        /* BABY PINK FOR START/LOGIN */
+        .baby-pink-btn {
+            background-color: #fbcfe8; /* Baby Pink */
+            color: #9d174d; /* Darker Pink text for readability */
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: none;
         }
 
         #runaway-btn { transition: all 0.2s ease; touch-action: none; z-index: 50; }
@@ -52,11 +80,11 @@
     <div id="hearts-bg" class="bg-hearts"></div>
 
     <div id="login-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Restricted Access</h2>
+        <h2 class="text-xl font-bold text-slate-800 mb-6">Login for Surprise</h2>
         <div class="space-y-4">
             <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400">
             <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400">
-            <button id="login-trigger" type="button" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg active:bg-rose-700">Login</button>
+            <button id="login-trigger" type="button" class="w-full baby-pink-btn shadow-lg active:opacity-80 transition-opacity">Login</button>
         </div>
         <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
     </div>
@@ -64,122 +92,3 @@
     <div id="welcome-section" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Target</span>! 👋</h1>
         <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
-        <button id="start-trigger" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800">Start</button>
-    </div>
-
-    <div id="quiz-container" class="glass-card text-center p-8 rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
-        <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
-        <div class="flex justify-center gap-4 relative h-16 items-center">
-            <button id="target-btn" type="button" class="quiz-btn active:scale-95"></button>
-            <button id="runaway-btn" type="button" class="quiz-btn"></button>
-        </div>
-        <p id="progress" class="mt-8 text-xs text-slate-300 font-medium tracking-widest uppercase"></p>
-    </div>
-
-    <script>
-        const VALID_USERNAME = "SpecialOne"; 
-        const VALID_PASSWORD = "123";
-        const TARGET_NAME = "Poonam Shukla"; 
-
-        const quizData = [
-            { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
-            { q: "Hum dono mein se pagal kon hai?", target: "Main", run: "Tum" },
-            { q: "Hum dono mein se dimaag wala kon hai?", target: "Tum", run: "Main" },
-            { q: "Hum dono mein se sabse aalsi kon hai?", target: "Main", run: "Tum" },
-            { q: "Hum dono mein se caring kon hai", target: "Tum", run: "Main" },
-            { q: "Hum dono mein se Kalesh kon karta hai?", target: "Main", run: "Tum" },
-            { q: "Hum dono mein se samjhne wala kon hai?", target: "Tum", run: "Main" },
-            { q: "Will you be my Valentine?", target: "Yes Yes Yess!!!", run: "NO!" }
-        ];
-
-        let currentStep = 0;
-
-        function createHeart() {
-            const container = document.getElementById('hearts-bg');
-            if (!container) return;
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.classList.add('floating-heart');
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
-            heart.style.animationDuration = (Math.random() * 4 + 4) + 's';
-            container.appendChild(heart);
-            setTimeout(() => heart.remove(), 8000);
-        }
-        setInterval(createHeart, 500);
-
-        function checkLogin() {
-            const u = document.getElementById('user-id').value.trim();
-            const p = document.getElementById('user-pass').value.trim();
-            if(u === VALID_USERNAME && p === VALID_PASSWORD) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('welcome-section').classList.remove('hidden');
-                document.getElementById('display-name').innerText = TARGET_NAME;
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
-        }
-
-        function startQuiz() {
-            document.getElementById('welcome-section').classList.add('hidden');
-            document.getElementById('quiz-container').classList.remove('hidden');
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('question-text').innerText = quizData[currentStep].q;
-            document.getElementById('target-btn').innerText = quizData[currentStep].target;
-            const runBtn = document.getElementById('runaway-btn');
-            runBtn.innerText = quizData[currentStep].run;
-            runBtn.style.position = 'static';
-            document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
-        }
-
-        function moveButton() {
-            const btn = document.getElementById('runaway-btn');
-            const padding = 25; // Safer padding for mobile
-            
-            // Limit movement to visible screen area
-            const maxX = window.innerWidth - btn.offsetWidth - padding;
-            const maxY = window.innerHeight - btn.offsetHeight - padding;
-            
-            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-            
-            btn.style.position = 'fixed';
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
-        }
-
-        document.getElementById('login-trigger').addEventListener('click', checkLogin);
-        document.getElementById('start-trigger').addEventListener('click', startQuiz);
-
-        const runBtn = document.getElementById('runaway-btn');
-        // Combined hover and touch
-        runBtn.addEventListener('mouseenter', moveButton);
-        runBtn.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            moveButton(); 
-        });
-
-        document.getElementById('target-btn').addEventListener('click', () => {
-            currentStep++;
-            if (currentStep < quizData.length) {
-                updateUI();
-            } else {
-                confetti({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#e11d48', '#fb7185', '#ffffff']
-                });
-                document.getElementById('quiz-container').innerHTML = `
-                    <div class="heart-icon mb-4" style="text-align:center; display:block;">❤️</div>
-                    <h1 class="text-3xl font-bold text-rose-600 mb-2">Yayyyyy!</h1>
-                    <p class="text-slate-500 font-medium">I knew you'd say yes! 😉</p>
-                `;
-            }
-        });
-    </script>
-</body>
-</html>
