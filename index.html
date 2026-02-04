@@ -5,57 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sawal Jawab ❤️</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        #runaway-btn { 
-            transition: all 0.2s ease; 
-            touch-action: none; 
-            z-index: 50; 
+        body { background-color: #fff1f2; overflow: hidden; margin: 0; }
+        
+        /* Floating Hearts Background */
+        .bg-hearts {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
         }
-        .heart { 
-            color: #e11d48; 
-            font-size: 50px; 
-            animation: pulse 1.5s infinite; 
+        .floating-heart {
+            position: absolute;
+            bottom: -50px;
+            color: #fecdd3; /* Soft Pink */
+            animation: float 10s linear infinite;
+            opacity: 0.6;
         }
-        @keyframes pulse { 
-            0% { transform: scale(1); } 
-            50% { transform: scale(1.2); } 
-            100% { transform: scale(1); } 
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
         }
+
+        /* Runaway Button Style */
+        #runaway-btn { transition: all 0.2s ease; touch-action: none; z-index: 50; }
+        
         .hidden { display: none !important; }
-        /* Prevent zoom on focus in iOS */
         input { font-size: 16px !important; }
+
+        /* Final Heart Animation */
+        .big-heart {
+            font-size: 80px;
+            animation: heartbeat 1.2s infinite;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.3); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
+        }
     </style>
 </head>
-<body class="bg-rose-50 h-screen flex items-center justify-center overflow-hidden font-sans p-4">
+<body class="h-screen flex items-center justify-center font-sans p-4">
 
-    <div id="login-section" class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
+    <div id="hearts-bg" class="bg-hearts"></div>
+
+    <div id="login-section" class="text-center p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100">
         <h2 class="text-xl font-bold text-slate-800 mb-6">Restricted Access</h2>
         <div class="space-y-4">
-            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400 bg-slate-50">
-            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400 bg-slate-50">
-            <button id="login-trigger" type="button" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg active:bg-rose-700 transition-colors">
-                Login
-            </button>
+            <input type="text" id="user-id" placeholder="User ID" autocomplete="off" class="w-full p-3 border rounded-xl outline-rose-400">
+            <input type="password" id="user-pass" placeholder="Password" class="w-full p-3 border rounded-xl outline-rose-400">
+            <button id="login-trigger" type="button" class="w-full bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg active:bg-rose-700">Login</button>
         </div>
         <p id="login-error" class="text-red-500 text-sm mt-3 hidden">Incorrect details, try again!</p>
     </div>
 
-    <div id="welcome-section" class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
+    <div id="welcome-section" class="text-center p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 class="text-3xl font-bold text-slate-800 mb-2">Hello, <span id="display-name">Target</span>! 👋</h1>
         <p class="text-slate-500 mb-8">I have a few questions for you today...</p>
-        <button id="start-trigger" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800 transition-colors">
-            Start
-        </button>
+        <button id="start-trigger" type="button" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-xl shadow-lg active:bg-indigo-800">Start</button>
     </div>
 
-    <div id="quiz-container" class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
+    <div id="quiz-container" class="text-center p-8 bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-sm w-full border border-rose-100 hidden">
         <h1 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 min-h-[4rem]"></h1>
-        
         <div class="flex justify-center gap-4 relative h-16 items-center">
             <button id="target-btn" type="button" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all active:scale-95"></button>
-            <button id="runaway-btn" type="button" class="bg-slate-100 text-slate-400 font-bold py-3 px-8 rounded-2xl border border-slate-200 shadow-sm"></button>
+            <button id="runaway-btn" type="button" class="bg-slate-100 text-slate-400 font-bold py-3 px-8 rounded-2xl border border-slate-200"></button>
         </div>
-        
         <p id="progress" class="mt-8 text-xs text-slate-300 font-medium tracking-widest uppercase"></p>
     </div>
 
@@ -69,101 +87,4 @@
             { q: "Hum dono mein se kon jyada khubsurat hai?", target: "Tum", run: "Main" },
             { q: "Hum dono mein se pagal kon hai?", target: "Main", run: "Tum" },
             { q: "Hum dono mein se dimaag wala kon hai?", target: "Tum", run: "Main" },
-            { q: "Hum dono mein se sabse aalsi kon hai?", target: "Main", run: "Tum" },
-            { q: "Hum dono mein se caring kon hai", target: "Tum", run: "Main" },
-            { q: "Hum dono mein se Kalesh kon karta hai?", target: "Main", run: "Tum" },
-            { q: "Hum dono mein se samjhne wala kon hai?", target: "Tum", run: "Main" },
-            { q: "Will you be my Valentine?", target: "Yes Yes Yess!!!", run: "NO!" }
-        ];
-
-        let currentStep = 0;
-
-        // Login Logic
-        function checkLogin() {
-            const u = document.getElementById('user-id').value.trim();
-            const p = document.getElementById('user-pass').value.trim();
-            
-            if(u === VALID_USERNAME && p === VALID_PASSWORD) {
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('welcome-section').classList.remove('hidden');
-                document.getElementById('display-name').innerText = TARGET_NAME;
-            } else {
-                document.getElementById('login-error').classList.remove('hidden');
-            }
-        }
-
-        // Quiz Start Logic
-        function startQuiz() {
-            document.getElementById('welcome-section').classList.add('hidden');
-            document.getElementById('quiz-container').classList.remove('hidden');
-            updateUI();
-        }
-
-        // UI Update Logic
-        function updateUI() {
-            document.getElementById('question-text').innerText = quizData[currentStep].q;
-            document.getElementById('target-btn').innerText = quizData[currentStep].target;
-            
-            const runBtn = document.getElementById('runaway-btn');
-            runBtn.innerText = quizData[currentStep].run;
-            
-            runBtn.style.position = 'static';
-            runBtn.style.left = 'auto';
-            runBtn.style.top = 'auto';
-
-            document.getElementById('progress').innerText = `${currentStep + 1} / ${quizData.length}`;
-        }
-
-        // Runaway Button Logic
-        function moveButton() {
-            const btn = document.getElementById('runaway-btn');
-            const padding = 40;
-            const maxX = window.innerWidth - btn.offsetWidth - padding;
-            const maxY = window.innerHeight - btn.offsetHeight - padding;
-            
-            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
-            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
-
-            btn.style.position = 'fixed';
-            btn.style.left = randomX + 'px';
-            btn.style.top = randomY + 'px';
-        }
-
-        // Event Listeners for Mobile Compatibility
-        const loginBtn = document.getElementById('login-trigger');
-        loginBtn.addEventListener('click', checkLogin);
-        loginBtn.addEventListener('touchstart', (e) => { 
-            // Avoid double-firing
-            if(e.cancelable) e.preventDefault(); 
-            checkLogin(); 
-        });
-
-        const startBtn = document.getElementById('start-trigger');
-        startBtn.addEventListener('click', startQuiz);
-        startBtn.addEventListener('touchstart', (e) => { 
-            if(e.cancelable) e.preventDefault(); 
-            startQuiz(); 
-        });
-
-        const runBtn = document.getElementById('runaway-btn');
-        runBtn.addEventListener('mouseenter', moveButton);
-        runBtn.addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            moveButton(); 
-        });
-
-        document.getElementById('target-btn').addEventListener('click', () => {
-            currentStep++;
-            if (currentStep < quizData.length) {
-                updateUI();
-            } else {
-                document.getElementById('quiz-container').innerHTML = `
-                    <div class="heart mb-4">❤️</div>
-                    <h1 class="text-3xl font-bold text-rose-600 mb-2">Yayyyyy!</h1>
-                    <p class="text-slate-500">I knew you'd say yes! 😉</p>
-                `;
-            }
-        });
-    </script>
-</body>
-</html>
+            { q: "Hum dono mein se sabse aalsi kon hai?", target: "Main", run:
