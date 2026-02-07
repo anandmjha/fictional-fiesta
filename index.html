@@ -164,7 +164,7 @@
         function checkLogin() {
             if(document.getElementById('user-id').value === VALID_USERNAME && document.getElementById('user-pass').value === VALID_PASSWORD) {
                 // START MUSIC ON LOGIN
-                music.volume = 0.4; // Soft tone
+                music.volume = 0.2; // Soft tone
                 music.play().catch(e => console.log("Audio play blocked until further interaction"));
                 
                 document.getElementById('login-section').classList.add('hidden');
