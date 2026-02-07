@@ -66,7 +66,6 @@
             45%, 55% { transform: translateX(-28px) rotate(-15deg); }
         }
 
-        /* LIPS EFFECT */
         .pop-lips {
             position: absolute; left: 50%; top: 35%; transform: translateX(-50%);
             font-size: 35px; opacity: 0; z-index: 3;
@@ -78,7 +77,6 @@
             65%, 100% { opacity: 0; transform: translateX(-50%) scale(1); }
         }
 
-        /* TRIPLE PULSING HEARTS */
         .triple-hearts {
             display: flex; justify-content: center; gap: 15px;
             margin-top: 15px; font-size: 28px;
@@ -100,9 +98,11 @@
     </style>
 </head>
 <body class="h-screen flex items-center justify-center p-4">
+    
     <audio id="bg-music" loop>
         <source src="loop_music.mp3" type="audio/mpeg">
     </audio>
+
     <div id="hearts-bg" class="bg-hearts"></div>
 
     <div class="playground" id="main-playground">
@@ -147,6 +147,8 @@
         ];
 
         let currentStep = 0;
+        const music = document.getElementById('bg-music');
+
         function createHeart() {
             const container = document.getElementById('hearts-bg');
             const heart = document.createElement('div');
@@ -161,6 +163,10 @@
 
         function checkLogin() {
             if(document.getElementById('user-id').value === VALID_USERNAME && document.getElementById('user-pass').value === VALID_PASSWORD) {
+                // START MUSIC ON LOGIN
+                music.volume = 0.4; // Soft tone
+                music.play().catch(e => console.log("Audio play blocked until further interaction"));
+                
                 document.getElementById('login-section').classList.add('hidden');
                 document.getElementById('welcome-section').classList.remove('hidden');
                 document.getElementById('welcome-section').classList.add('fade-in');
@@ -168,6 +174,8 @@
         }
 
         function startQuiz() {
+            // Ensure music plays if it didn't at login
+            music.play();
             document.getElementById('welcome-section').classList.add('hidden');
             document.getElementById('quiz-container').classList.remove('hidden');
             document.getElementById('quiz-container').classList.add('fade-in');
